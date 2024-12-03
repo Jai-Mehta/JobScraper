@@ -30,7 +30,7 @@ def get_all_jobs(pages):
         if response.status_code != 200:
             warn(f"Request: {requests}; Status code: {response.status_code}")
 
-        if requests > 108:
+        if requests > 10:
             warn("Number of requests exceeded the limit.")
             break
 
