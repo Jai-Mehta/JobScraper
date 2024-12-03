@@ -124,7 +124,7 @@
 
 
 # def main():
-#     pages = [str(i) for i in range(1, 108)]
+#     pages = [str(i) for i in range(1, )]
 
 #     # Open the CSV file in write mode (overwrites existing content)
 #     with open('apple_jobs_today.csv', "w", newline='', encoding="utf-8") as f:
@@ -169,7 +169,7 @@ def get_all_jobs(pages, existing_jobs):
         if response.status_code != 200:
             warn(f"Request: {requests}; Status code: {response.status_code}")
 
-        if requests > 108:
+        if requests > 10:
             warn("Number of requests exceeded the limit.")
             break
 
