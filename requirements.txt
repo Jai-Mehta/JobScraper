@@ -1,8 +1,8 @@
 requests
 python-telegram-bot
 nest-asyncio
-ipython==7.4.0
-beautifulsoup4==4.7.1
-lxml==4.3.3
+ipython
+beautifulsoup4
+lxml
 numpy
 pandas
