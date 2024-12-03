@@ -50,13 +50,22 @@ jobs:
       uses: actions/checkout@v3
 
     # Step 2: Try to download the CSV artifact
+    # - name: Download CSV file artifact (if exists)
+    #   id: download-artifact
+    #   uses: actions/download-artifact@v3
+    #   with:
+    #     name: apple-jobs
+    #     path: .
+    #   continue-on-error: true # Allow the workflow to continue even if the artifact is missing
     - name: Download CSV file artifact (if exists)
       id: download-artifact
       uses: actions/download-artifact@v3
       with:
         name: apple-jobs
         path: .
-      continue-on-error: true # Allow the workflow to continue even if the artifact is missing
+      continue-on-error: true  # Continue even if CSV is missing
+
+
 
     # Step 3: Create an empty CSV file if artifact not found
     - name: Create empty CSV file if missing
@@ -89,9 +98,16 @@ jobs:
       run: python notifyApple.py
 
     # Step 8: Upload the updated CSV file as an artifact
+    # - name: Upload CSV file as artifact
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: apple-jobs
+    #     path: apple_jobs_today.csv
+    #     retention-days: 10
     - name: Upload CSV file as artifact
       uses: actions/upload-artifact@v3
       with:
         name: apple-jobs
         path: apple_jobs_today.csv
-        retention-days: 10
+        retention-days: 10  # Retain for 10 days
+
