@@ -94,3 +94,4 @@ jobs:
       with:
         name: apple-jobs
         path: apple_jobs_today.csv
+        retention-days: 10
