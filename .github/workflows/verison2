@@ -1,0 +1,82 @@
+name: Scrape and Notify v2
+
+on:
+  schedule:
+    # Runs every hour
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  scrape-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Step 2: Download the CSV artifact (if exists)
+    - name: Download CSV file artifact (if exists)
+      id: download-artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: apple-jobs
+        path: .
+      continue-on-error: true  # Continue even if no artifact exists
+
+    # Step 3: Verify the CSV file after downloading
+    - name: Check CSV File Content After Download
+      run: |
+        echo "CSV content after artifact download (if any):"
+        cat apple_jobs_today.csv || echo "No file found."
+
+    # Step 4: Create an empty CSV file if missing
+    - name: Create empty CSV file if missing
+      run: |
+        if [ ! -f apple_jobs_today.csv ]; then
+          echo "Artifact missing; creating an empty CSV file."
+          echo "Website,Title,Location,Job URL,Posted Date,Notify" > apple_jobs_today.csv
+        fi
+
+    # Step 5: Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    # Step 6: Install Python dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Step 7: Run the scraping script
+    - name: Run Scraping Script
+      run: python scrapeApple.py
+
+    # Step 8: Verify CSV file after scraping
+    - name: Check CSV File Content After Scraping
+      run: |
+        echo "CSV content after scraping script:"
+        cat apple_jobs_today.csv
+
+    # Step 9: Run the notification script
+    - name: Run Notification Script
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python notifyApple.py
+
+    # Step 10: Verify CSV file after notification
+    - name: Check CSV File Content After Notification Script
+      run: |
+        echo "CSV content after notification script:"
+        cat apple_jobs_today.csv
+
+    # Step 11: Upload the updated CSV file as an artifact
+    - name: Upload CSV file as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: apple-jobs
+        path: apple_jobs_today.csv
+        retention-days: 10
