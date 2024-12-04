@@ -18,44 +18,35 @@ async def send_telegram_message(bot, message):
 # async def process_jobs(csv_file):
 #     """Process jobs from the CSV file and send Telegram messages for new jobs."""
 #     bot = Bot(token=TELEGRAM_BOT_TOKEN)
-#     jobs = []
+#     all_jobs = []
+#     jobs_to_notify = []
 
-#     # Read jobs from the CSV file
+#     # Read all jobs and identify jobs to notify
 #     with open(csv_file, 'r', encoding='utf-8') as file:
 #         reader = csv.DictReader(file)
 #         for row in reader:
 #             if row['Notify'] == "No":  # Only process jobs not yet notified
-#                 jobs.append(row)
+#                 jobs_to_notify.append(row)
+#                 row['Notify'] = "Yes"  # Mark job as notified
+#             all_jobs.append(row)  # Preserve all jobs
 
-#     # Notify and update the Notify column
-#     for job in jobs:
-#         company = job['Website']
-#         title = job['Title']
-#         location = job['Location']
-#         job_link = job['Job URL']
-#         posted_date = job['Posted Date']
-
-#         # Prepare and send Telegram message
+#     # Notify via Telegram
+#     for job in jobs_to_notify:
 #         message = (
-#             f"Company: {company}\n"
-#             f"Job Title: {title}\n"
-#             f"Location: {location}\n"
-#             f"Job Link: {job_link}\n"
-#             f"Posted Date: {posted_date}"
+#             f"Company: {job['Website']}\n"
+#             f"Job Title: {job['Title']}\n"
+#             f"Location: {job['Location']}\n"
+#             f"Job Link: {job['Job URL']}\n"
+#             f"Posted Date: {job['Posted Date']}"
 #         )
-#         await send_telegram_message(bot, message)
+#         asyncio.run(send_telegram_message(bot, message))
 
-#         # Update the Notify status in the CSV file
-#         job['Notify'] = "Yes"
-
-#     # Rewrite the CSV file with updated Notify values
+#     # Write all jobs back to the CSV file with updated Notify values
 #     with open(csv_file, 'w', newline='', encoding='utf-8') as file:
 #         fieldnames = ['Website', 'Title', 'Location', 'Job URL', 'Posted Date', 'Notify']
 #         writer = csv.DictWriter(file, fieldnames=fieldnames)
 #         writer.writeheader()
-#         writer.writerows(jobs)
-
-#         print(f"Sent notifications for {len(jobs)} new jobs.")
+#         writer.writerows(all_jobs)
 async def process_jobs(csv_file):
     """Process jobs from the CSV file and send Telegram messages for new jobs."""
     bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -66,7 +57,7 @@ async def process_jobs(csv_file):
     with open(csv_file, 'r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            if row['Notify'] == "No":  # Only process jobs not yet notified
+            if row['Notify'].strip() == "No":  # Only process jobs not yet notified
                 jobs_to_notify.append(row)
                 row['Notify'] = "Yes"  # Mark job as notified
             all_jobs.append(row)  # Preserve all jobs
@@ -80,7 +71,7 @@ async def process_jobs(csv_file):
             f"Job Link: {job['Job URL']}\n"
             f"Posted Date: {job['Posted Date']}"
         )
-        asyncio.run(send_telegram_message(bot, message))
+        await send_telegram_message(bot, message)
 
     # Write all jobs back to the CSV file with updated Notify values
     with open(csv_file, 'w', newline='', encoding='utf-8') as file:
@@ -88,6 +79,7 @@ async def process_jobs(csv_file):
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(all_jobs)
+
 
 
 def main():
