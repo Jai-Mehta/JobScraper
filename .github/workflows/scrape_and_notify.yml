@@ -18,7 +18,7 @@ jobs:
     # Step 2: Try to download the CSV artifact
     - name: Download CSV file artifact (if exists)
       id: download-artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: apple-jobs
         path: .
@@ -58,7 +58,7 @@ jobs:
 
     # Step 8: Upload the updated CSV file as an artifact
     - name: Upload CSV file as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: apple-jobs
         path: apple_jobs_today.csv
